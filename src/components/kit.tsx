@@ -1,5 +1,5 @@
-import { useEffect, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from "react";
-import { Check, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { useEffect, useRef, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from "react";
+import { Check, ChevronDown, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { cn } from "../lib/utils";
 import { useApp } from "../context/AppState";
 
@@ -120,18 +120,101 @@ export function SelectField({
   options: { value: string; label: string }[];
   error?: string;
 }) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const selected = options.find((option) => option.value === value);
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointer = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    const onScroll = (event: Event) => {
+      if (menuRef.current?.contains(event.target as Node)) return;
+      setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("keydown", onKey);
+    window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("keydown", onKey);
+      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [open]);
+
+  const rect = open ? buttonRef.current?.getBoundingClientRect() : null;
+  const frame = open ? buttonRef.current?.closest(".device")?.getBoundingClientRect() : null;
+  const boundsTop = frame?.top ?? 0;
+  const boundsBottom = frame?.bottom ?? (typeof window === "undefined" ? 0 : window.innerHeight);
+  const spaceBelow = rect ? boundsBottom - rect.bottom : 0;
+  const spaceAbove = rect ? rect.top - boundsTop : 0;
+  const openUp = Boolean(rect && spaceBelow < 180 && spaceAbove > spaceBelow);
+  const maxHeight = rect ? Math.max(96, Math.min(220, (openUp ? spaceAbove : spaceBelow) - 20)) : 220;
+
   return (
-    <label className="block">
+    <div className="relative" ref={rootRef}>
       <span className="mb-1.5 block text-[13px] font-medium">{label}</span>
-      <select className={cn("field", error && "field-error")} value={value} onChange={(event) => onChange(event.target.value)}>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      <button
+        ref={buttonRef}
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className={cn("field flex items-center justify-between gap-2 text-left", error && "field-error", open && "border-primary")}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span className="truncate">{selected?.label || "Select"}</span>
+        <ChevronDown size={18} className={cn("shrink-0 text-muted-foreground transition-transform", open && "rotate-180")} />
+      </button>
+      {open && rect ? (
+        <div
+          ref={menuRef}
+          role="listbox"
+          aria-label={label}
+          className="overflow-auto rounded-xl border border-line bg-card py-1 shadow-lg"
+          style={{
+            position: "fixed",
+            left: rect.left,
+            width: rect.width,
+            maxHeight,
+            zIndex: 80,
+            top: openUp ? undefined : rect.bottom + 6,
+            bottom: openUp ? window.innerHeight - rect.top + 6 : undefined,
+          }}
+        >
+          {options.map((option) => {
+            const active = option.value === value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                role="option"
+                aria-selected={active}
+                className={cn(
+                  "flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left text-sm",
+                  active ? "bg-primary/10 font-semibold text-primary" : "text-foreground",
+                )}
+                onClick={() => {
+                  onChange(option.value);
+                  setOpen(false);
+                }}
+              >
+                <span className="truncate">{option.label}</span>
+                {active ? <Check size={16} /> : null}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
       {error ? <span className="mt-1 block text-xs text-primary">{error}</span> : null}
-    </label>
+    </div>
   );
 }
 

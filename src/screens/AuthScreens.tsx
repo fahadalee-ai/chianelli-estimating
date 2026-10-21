@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { ChevronLeft, Eye, EyeOff } from "lucide-react";
 import { logo } from "../img/manifest";
 import { useApp } from "../context/AppState";
 import { useNav } from "../navigation/nav";
@@ -45,13 +45,13 @@ export function LoginScreen() {
 
   return (
     <div className="screen bg-ink">
-      <div className="under-status px-6 pb-6 pt-4 text-white">
-        <img src={logo} alt="Chianelli Estimating" className="h-16 w-auto rounded-xl bg-white px-3 py-2" />
-        <h1 className="font-display mt-5 text-[32px] font-bold">Welcome Back</h1>
-        <p className="mt-1 text-sm text-white/70">Sign in to estimates, projects, and bookings.</p>
+      <div className="under-status px-6 pb-10 pt-2 text-white">
+        <img src={logo} alt="Chianelli Estimating" className="h-14 w-auto rounded-2xl bg-white px-3 py-2" />
+        <h1 className="font-display mt-6 text-[30px] font-bold leading-tight">Welcome back</h1>
+        <p className="mt-2 max-w-[280px] text-sm leading-relaxed text-white/70">Sign in to estimates, projects, and bookings.</p>
       </div>
-      <div className="scroll rounded-t-3xl bg-card pt-6">
-        <div className="space-y-3">
+      <div className="auth-sheet">
+        <div className="space-y-5">
           <InputField label="Email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />
           <div className="relative">
             <InputField
@@ -61,13 +61,13 @@ export function LoginScreen() {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
             />
-            <button type="button" aria-label={show ? "Hide password" : "Show password"} className="absolute right-3 top-9 text-muted-foreground" onClick={() => setShow((value) => !value)}>
+            <button type="button" aria-label={show ? "Hide password" : "Show password"} className="absolute right-1 top-10 grid h-10 w-10 place-items-center text-muted-foreground" onClick={() => setShow((value) => !value)}>
               {show ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between pt-1 text-sm">
             <label className="flex items-center gap-2">
-              <input type="checkbox" checked={remember} onChange={(event) => setRemember(event.target.checked)} />
+              <input type="checkbox" className="h-4 w-4 accent-primary" checked={remember} onChange={(event) => setRemember(event.target.checked)} />
               Remember me
             </label>
             <button className="font-semibold text-primary" onClick={() => push({ name: "forgot" })}>
@@ -77,18 +77,20 @@ export function LoginScreen() {
           <PrimaryButton loading={loading === "form"} onClick={() => submit()}>
             Login
           </PrimaryButton>
-          <div className="flex items-center gap-3 py-1 text-xs text-muted-foreground">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="h-px flex-1 bg-line" />
             or continue with
             <span className="h-px flex-1 bg-line" />
           </div>
-          <SecondaryButton loading={loading === "google"} onClick={() => submit("google")}>
-            Google
-          </SecondaryButton>
-          <SecondaryButton loading={loading === "apple"} onClick={() => submit("apple")}>
-            Apple
-          </SecondaryButton>
-          <p className="pb-4 text-center text-sm text-muted-foreground">
+          <div className="space-y-3">
+            <SecondaryButton loading={loading === "google"} onClick={() => submit("google")}>
+              Google
+            </SecondaryButton>
+            <SecondaryButton loading={loading === "apple"} onClick={() => submit("apple")}>
+              Apple
+            </SecondaryButton>
+          </div>
+          <p className="pt-1 text-center text-sm text-muted-foreground">
             Don't have an account?{" "}
             <button className="font-semibold text-primary" onClick={() => push({ name: "register" })}>
               Sign Up
@@ -201,12 +203,12 @@ export function RegisterScreen() {
 
   if (step === 2) {
     return (
-      <div className="screen">
-        <div className="scroll flex flex-col items-center justify-center text-center">
+      <div className="screen bg-ink">
+        <div className="auth-sheet is-flat flex flex-col items-center justify-center text-center">
           <SuccessMark />
           <h1 className="font-display mt-5 text-2xl font-bold">You're in</h1>
-          <p className="mt-2 max-w-[260px] text-sm text-muted-foreground">Your Chianelli account is ready. Start an estimate or book time with an estimator.</p>
-          <div className="mt-6 w-full">
+          <p className="mt-2 max-w-[260px] text-sm leading-relaxed text-muted-foreground">Your Chianelli account is ready. Start an estimate or book time with an estimator.</p>
+          <div className="mt-8 w-full">
             <PrimaryButton onClick={() => reset({ name: "home" })}>Go to Home</PrimaryButton>
           </div>
         </div>
@@ -215,59 +217,76 @@ export function RegisterScreen() {
   }
 
   return (
-    <div className="screen">
-      <TopBar title="Create Account" onBack={step === 0 ? back : () => setStep(0)} />
-      <div className="scroll">
-        <div className="mb-2 flex items-center gap-3">
-          <img src={logo} alt="" className="h-10 rounded-lg bg-white" />
-        </div>
+    <div className="screen bg-ink">
+      <div className="under-status px-6 pb-10 pt-2 text-white">
+        <button
+          type="button"
+          aria-label="Back"
+          className="mb-5 grid h-11 w-11 place-items-center rounded-full bg-white/10"
+          onClick={step === 0 ? back : () => setStep(0)}
+        >
+          <ChevronLeft size={22} />
+        </button>
+        <img src={logo} alt="Chianelli Estimating" className="h-12 w-auto rounded-xl bg-white px-2.5 py-1.5" />
+        <h1 className="font-display mt-5 text-[28px] font-bold leading-tight">{step === 0 ? "Create your account" : "Tell us about you"}</h1>
+        <p className="mt-2 max-w-[280px] text-sm leading-relaxed text-white/70">
+          {step === 0 ? "A few details, then you can start estimating." : "This helps us tailor estimates and bookings."}
+        </p>
+      </div>
+      <div className="auth-sheet">
         <StepIndicator steps={["Account", "Profile"]} current={step} />
         {step === 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-5">
             <InputField label="Full Name" value={form.fullName} onChange={(event) => set({ fullName: event.target.value })} />
             <InputField label="Email" type="email" value={form.email} onChange={(event) => set({ email: event.target.value })} />
             <InputField label="Phone" inputMode="tel" value={form.phone} onChange={(event) => set({ phone: maskPhone(event.target.value) })} />
             <div className="relative">
               <InputField label="Password" type={show ? "text" : "password"} value={form.password} onChange={(event) => set({ password: event.target.value })} />
-              <button type="button" aria-label="Toggle password visibility" className="absolute right-3 top-9 text-muted-foreground" onClick={() => setShow((value) => !value)}>
+              <button type="button" aria-label="Toggle password visibility" className="absolute right-1 top-10 grid h-10 w-10 place-items-center text-muted-foreground" onClick={() => setShow((value) => !value)}>
                 {show ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             <InputField label="Confirm Password" type={show ? "text" : "password"} value={form.confirm} onChange={(event) => set({ confirm: event.target.value })} />
-            <PrimaryButton onClick={next}>Continue</PrimaryButton>
+            <div className="pt-1">
+              <PrimaryButton onClick={next}>Continue</PrimaryButton>
+            </div>
           </div>
         ) : (
-          <div className="space-y-3">
-            <p className="text-sm font-medium">I am a</p>
-            <div className="flex flex-wrap gap-2">
-              {ROLES.map((role) => (
-                <Chip key={role} active={form.role === role} onClick={() => set({ role })}>
-                  {role}
-                </Chip>
-              ))}
+          <div className="space-y-5">
+            <div>
+              <p className="mb-2 text-sm font-medium">I am a</p>
+              <div className="flex flex-wrap gap-2">
+                {ROLES.map((role) => (
+                  <Chip key={role} active={form.role === role} onClick={() => set({ role })}>
+                    {role}
+                  </Chip>
+                ))}
+              </div>
             </div>
             <InputField label="Company Name (optional)" value={form.company} onChange={(event) => set({ company: event.target.value })} />
             <InputField label="City" value={form.city} onChange={(event) => set({ city: event.target.value })} />
             <SelectField label="State" value={form.state} onChange={(state) => set({ state })} options={US_STATES.map(([value, label]) => ({ value, label }))} />
             <InputField label="ZIP" inputMode="numeric" value={form.zip} onChange={(event) => set({ zip: event.target.value.replace(/\D/g, "").slice(0, 5) })} />
-            <p className="text-sm font-medium">Interested in</p>
-            <div className="flex flex-wrap gap-2">
-              {INTERESTS.map((item) => (
-                <Chip
-                  key={item}
-                  active={form.interests.includes(item)}
-                  onClick={() =>
-                    set({
-                      interests: form.interests.includes(item) ? form.interests.filter((value) => value !== item) : [...form.interests, item],
-                    })
-                  }
-                >
-                  {item}
-                </Chip>
-              ))}
+            <div>
+              <p className="mb-2 text-sm font-medium">Interested in</p>
+              <div className="flex flex-wrap gap-2">
+                {INTERESTS.map((item) => (
+                  <Chip
+                    key={item}
+                    active={form.interests.includes(item)}
+                    onClick={() =>
+                      set({
+                        interests: form.interests.includes(item) ? form.interests.filter((value) => value !== item) : [...form.interests, item],
+                      })
+                    }
+                  >
+                    {item}
+                  </Chip>
+                ))}
+              </div>
             </div>
-            <label className="flex items-start gap-2 text-sm">
-              <input type="checkbox" className="mt-1" checked={form.agree} onChange={(event) => set({ agree: event.target.checked })} />
+            <label className="flex items-start gap-2 text-sm leading-relaxed">
+              <input type="checkbox" className="mt-1 h-4 w-4 accent-primary" checked={form.agree} onChange={(event) => set({ agree: event.target.checked })} />
               <span>I agree to the Terms & Privacy Policy.</span>
             </label>
             <PrimaryButton loading={loading} onClick={create}>
