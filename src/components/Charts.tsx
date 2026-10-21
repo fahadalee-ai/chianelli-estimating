@@ -15,8 +15,8 @@ export function DonutChart({ slices, center }: { slices: Slice[]; center?: strin
   let offset = 0;
 
   return (
-    <div className="flex items-center gap-4">
-      <svg viewBox="0 0 120 120" className="h-36 w-36 shrink-0" role="img" aria-label="Cost breakdown chart">
+    <div className="flex flex-col gap-4">
+      <svg viewBox="0 0 120 120" className="mx-auto h-40 w-40" role="img" aria-label="Cost breakdown chart">
         <circle cx="60" cy="60" r={radius} fill="none" stroke="var(--muted)" strokeWidth="14" />
         {slices.map((slice) => {
           const length = circ * slice.pct;
@@ -46,12 +46,12 @@ export function DonutChart({ slices, center }: { slices: Slice[]; center?: strin
           </text>
         ) : null}
       </svg>
-      <ul className="min-w-0 flex-1 space-y-1.5">
+      <ul className="space-y-2.5">
         {slices.map((slice) => (
-          <li key={slice.key} className="flex items-center gap-2 text-xs">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ background: chartColor(slice.key) }} />
-            <span className="flex-1 truncate text-muted-foreground">{slice.label}</span>
-            <span className="font-semibold">{Math.round(slice.pct * 100)}%</span>
+          <li key={slice.key} className="flex items-center gap-2.5 text-[15px] leading-snug">
+            <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: chartColor(slice.key) }} />
+            <span className="min-w-0 flex-1">{slice.label}</span>
+            <span className="font-semibold tabular-nums">{Math.round(slice.pct * 100)}%</span>
           </li>
         ))}
       </ul>
@@ -63,12 +63,12 @@ export function Gantt({ phases, total }: { phases: { name: string; days: number;
   return (
     <div className="space-y-2.5">
       {phases.map((phase) => (
-        <div key={phase.name} className="grid grid-cols-[108px_1fr_42px] items-center gap-2">
-          <span className="truncate text-[11px] text-muted-foreground">{phase.name}</span>
+        <div key={phase.name} className="grid grid-cols-[minmax(0,8.5rem)_1fr_auto] items-center gap-2.5">
+          <span className="text-[13px] leading-tight text-muted-foreground">{phase.name}</span>
           <span className="h-2.5 overflow-hidden rounded-full bg-muted">
             <span className="block h-full rounded-full bg-primary" style={{ width: `${Math.max(8, (phase.days / total) * 100)}%` }} />
           </span>
-          <span className="text-right text-[11px] font-semibold">{phase.label}</span>
+          <span className="text-right text-[13px] font-semibold tabular-nums">{phase.label}</span>
         </div>
       ))}
     </div>

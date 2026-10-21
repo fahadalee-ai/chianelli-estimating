@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import * as Lucide from "lucide-react";
 import { useApp } from "../context/AppState";
 import { useNav } from "../navigation/nav";
-import { BottomSheet, EmptyState, InputField, PrimaryButton, SecondaryButton, SectionHeader, Segmented, SelectField, StepIndicator, ToggleRow, TopBar, useCountUp } from "../components/kit";
+import { BottomSheet, ChoiceGroup, EmptyState, InputField, PrimaryButton, SecondaryButton, SectionHeader, Segmented, SelectField, StepIndicator, ToggleRow, TopBar, useCountUp } from "../components/kit";
 import { DonutChart, Gantt } from "../components/Charts";
 import { photo } from "../img/manifest";
 import { US_STATES } from "../data/content";
@@ -123,7 +123,7 @@ export function CalculatorScreen() {
   return (
     <div className="screen">
       <TopBar title="Estimate" onBack={step === 0 ? back : () => setStep((value) => value - 1)} />
-      <div className="scroll pb-44">
+      <div className="scroll has-dock">
         <StepIndicator steps={steps} current={step} />
         {step === 0 ? (
           <div className="space-y-3">
@@ -250,19 +250,17 @@ function Details({
         <InputField label="Floors / Stories" type="number" value={draft.floors} onChange={(event) => setDraft({ floors: Number(event.target.value) })} />
         <InputField label="Ceiling Height (ft)" type="number" value={draft.ceilingHeight} onChange={(event) => setDraft({ ceilingHeight: Number(event.target.value) })} />
       </div>
-      <div>
-        <p className="mb-2 text-sm font-medium">Quality Level</p>
-        <Segmented
-          value={draft.quality}
-          options={[
-            { id: "economy", label: "Economy" },
-            { id: "standard", label: "Standard" },
-            { id: "premium", label: "Premium" },
-            { id: "luxury", label: "Luxury" },
-          ]}
-          onChange={(quality) => setDraft({ quality })}
-        />
-      </div>
+      <ChoiceGroup
+        label="Quality Level"
+        value={draft.quality}
+        options={[
+          { id: "economy", label: "Economy" },
+          { id: "standard", label: "Standard" },
+          { id: "premium", label: "Premium" },
+          { id: "luxury", label: "Luxury" },
+        ]}
+        onChange={(quality) => setDraft({ quality })}
+      />
       <SelectField
         label="Site Condition"
         value={draft.site}
@@ -405,65 +403,65 @@ export function ResultScreen() {
         <div className="rounded-2xl bg-ink p-4 text-white">
           <span className="mb-3 block h-1 w-10 rounded-full bg-primary" />
           <p className="font-display text-lg font-semibold">{result.input.projectName || "Untitled project"}</p>
-          <p className="mt-1 text-xs text-white/70">
+          <p className="mt-1 text-sm text-white/70">
             {result.typeLabel} · {Number(result.input.area).toLocaleString("en-US")} sq ft · {result.input.quality}
           </p>
-          <p className="mt-4 text-[11px] uppercase tracking-wide text-white/50">Total Estimated Cost</p>
+          <p className="mt-4 text-[13px] uppercase tracking-wide text-white/50">Total Estimated Cost</p>
           <p className="font-display text-[34px] font-bold leading-none text-primary">{money(total)}</p>
-          <p className="mt-2 text-sm text-white/80">
+          <p className="mt-2 text-[15px] text-white/80">
             {money(result.low)} – {money(result.high)}
           </p>
-          <span className="mt-3 inline-flex rounded-full bg-white/10 px-3 py-1 text-xs">{money(result.perSqft)} / sq ft</span>
+          <span className="mt-3 inline-flex rounded-full bg-white/10 px-3 py-1.5 text-sm">{money(result.perSqft)} / sq ft</span>
         </div>
         <div className="card p-4">
           <DonutChart slices={result.slices} />
         </div>
         <div className="card px-4">
-          <button className="flex h-12 w-full items-center justify-between text-sm font-semibold" onClick={() => setOpenMat((value) => !value)}>
-            Material breakdown <Lucide.ChevronDown size={18} className={openMat ? "rotate-180" : ""} />
+          <button className="flex min-h-12 w-full items-center justify-between py-3 text-[17px] font-semibold" onClick={() => setOpenMat((value) => !value)}>
+            Material breakdown <Lucide.ChevronDown size={20} className={openMat ? "rotate-180" : ""} />
           </button>
           {openMat ? (
-            <div className="pb-3">
+            <div className="pb-2">
               {result.materialLines.map((line: { name: string; qty: number; unit: string; unitPrice: number; total: number }) => (
-                <div key={line.name} className="grid grid-cols-[1fr_auto] gap-2 border-t border-line py-2 text-xs">
+                <div key={line.name} className="grid grid-cols-[1fr_auto] items-start gap-3 border-t border-line py-3 text-[15px]">
                   <span>
                     {line.name}
-                    <span className="block text-muted-foreground">
+                    <span className="mt-0.5 block text-[13px] leading-snug text-muted-foreground">
                       {formatQty(line.qty)} {line.unit} × {moneyExact(line.unitPrice)}
                     </span>
                   </span>
-                  <span className="font-semibold">{money(line.total)}</span>
+                  <span className="font-semibold tabular-nums">{money(line.total)}</span>
                 </div>
               ))}
             </div>
           ) : null}
         </div>
         <div className="card px-4">
-          <button className="flex h-12 w-full items-center justify-between text-sm font-semibold" onClick={() => setOpenLab((value) => !value)}>
-            Labour breakdown <Lucide.ChevronDown size={18} className={openLab ? "rotate-180" : ""} />
+          <button className="flex min-h-12 w-full items-center justify-between py-3 text-[17px] font-semibold" onClick={() => setOpenLab((value) => !value)}>
+            Labour breakdown <Lucide.ChevronDown size={20} className={openLab ? "rotate-180" : ""} />
           </button>
           {openLab ? (
-            <div className="pb-3">
+            <div className="pb-2">
               {result.labourLines.map((line: { trade: string; hours: number; rate: number; total: number }) => (
-                <div key={line.trade} className="grid grid-cols-[1fr_auto] gap-2 border-t border-line py-2 text-xs">
+                <div key={line.trade} className="grid grid-cols-[1fr_auto] items-start gap-3 border-t border-line py-3 text-[15px]">
                   <span>
                     {line.trade}
-                    <span className="block text-muted-foreground">
+                    <span className="mt-0.5 block text-[13px] leading-snug text-muted-foreground">
                       {line.hours} hrs × {money(line.rate)}/hr
                     </span>
                   </span>
-                  <span className="font-semibold">{money(line.total)}</span>
+                  <span className="font-semibold tabular-nums">{money(line.total)}</span>
                 </div>
               ))}
             </div>
           ) : null}
         </div>
         <div className="card p-4">
-          <h2 className="font-display mb-1 text-base font-semibold">Time estimate</h2>
-          <p className="mb-3 text-sm text-muted-foreground">{result.durationLabel}</p>
+          <h2 className="font-display mb-1 text-[17px] font-semibold">Time estimate</h2>
+          <p className="mb-3 text-[15px] text-muted-foreground">{result.durationLabel}</p>
           <Gantt phases={result.phases} total={result.durationDays} />
         </div>
-        <div className="card p-4 text-sm">
+        <div className="card p-4 text-[15px]">
           {[
             ["Materials subtotal", result.materials],
             ["Labour subtotal", result.labour],
@@ -482,7 +480,7 @@ export function ResultScreen() {
             <span className="text-primary">{money(result.total)}</span>
           </div>
         </div>
-        <p className="rounded-2xl bg-muted px-4 py-3 text-xs leading-relaxed text-muted-foreground">This is a preliminary estimate. Book an appointment for a detailed, on-site estimate.</p>
+        <p className="rounded-2xl bg-muted px-4 py-3 text-[13px] leading-relaxed text-muted-foreground">This is a preliminary estimate. Book an appointment for a detailed, on-site estimate.</p>
         <PrimaryButton onClick={() => push({ name: "book", estimateId: active?.id })}>Book Appointment</PrimaryButton>
         <div className="grid grid-cols-2 gap-2">
           <SecondaryButton
@@ -539,13 +537,13 @@ export function ResultScreen() {
                 setCompare(false);
               }}
             >
-              <span className="text-[11px] uppercase text-muted-foreground">{item.quality}</span>
-              <span className="mt-1 block font-display text-sm font-bold text-primary">{money(item.total)}</span>
-              <span className="mt-1 block text-[11px] text-muted-foreground">{money(item.perSqft)}/sq ft</span>
+              <span className="text-[13px] uppercase text-muted-foreground">{item.quality}</span>
+              <span className="mt-1 block font-display text-[15px] font-bold text-primary">{money(item.total)}</span>
+              <span className="mt-1 block text-[13px] text-muted-foreground">{money(item.perSqft)}/sq ft</span>
             </button>
           ))}
         </div>
-        <p className="mt-3 text-xs text-muted-foreground">Tap a column to apply that specification. Luxury stays available in the quality control.</p>
+        <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">Tap a column to apply that specification. Luxury stays available in the quality control.</p>
       </BottomSheet>
     </div>
   );

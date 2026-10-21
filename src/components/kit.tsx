@@ -309,18 +309,64 @@ export function Segmented({
   onChange: (id: string) => void;
 }) {
   return (
-    <div className="grid gap-1 rounded-xl bg-muted p-1" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
-      {options.map((option) => (
-        <button
-          key={option.id}
-          type="button"
-          aria-pressed={value === option.id}
-          className={cn("h-10 rounded-lg text-xs font-semibold", value === option.id ? "bg-card text-primary shadow-sm" : "text-muted-foreground")}
-          onClick={() => onChange(option.id)}
-        >
-          {option.label}
-        </button>
-      ))}
+    <div role="radiogroup" className="grid gap-0.5 rounded-[10px] bg-muted p-0.5" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
+      {options.map((option) => {
+        const selected = value === option.id;
+        return (
+          <button
+            key={option.id}
+            type="button"
+            role="radio"
+            aria-checked={selected}
+            className={cn(
+              "min-h-11 rounded-[8px] px-2 text-[15px] font-medium",
+              selected ? "bg-card font-semibold text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.12)]" : "text-muted-foreground",
+            )}
+            onClick={() => onChange(option.id)}
+          >
+            {option.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function ChoiceGroup({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: { id: string; label: string }[];
+  onChange: (id: string) => void;
+}) {
+  const labelId = `${label.replace(/\s+/g, "-").toLowerCase()}-label`;
+  return (
+    <div>
+      <p id={labelId} className="mb-1.5 text-[13px] font-medium">
+        {label}
+      </p>
+      <div role="radiogroup" aria-labelledby={labelId} className="overflow-hidden rounded-xl border border-line bg-card">
+        {options.map((option, index) => {
+          const selected = value === option.id;
+          return (
+            <button
+              key={option.id}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              className={cn("flex min-h-12 w-full items-center gap-3 px-3.5 text-left text-[15px] active:bg-muted", index > 0 && "border-t border-line")}
+              onClick={() => onChange(option.id)}
+            >
+              <span className="flex-1">{option.label}</span>
+              <Check className={cn("shrink-0", selected ? "text-primary" : "invisible")} size={18} strokeWidth={2.5} aria-hidden />
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
