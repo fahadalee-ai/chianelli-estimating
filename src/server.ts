@@ -1,5 +1,6 @@
 import "./lib/error-capture";
 
+import previewHtml from "../preview.html?raw";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
@@ -44,8 +45,25 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+function previewResponse() {
+  return new Response(previewHtml, {
+    headers: { "content-type": "text/html; charset=utf-8" },
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const url = new URL(request.url);
+    const pathname = url.pathname;
+    if (pathname === "/preview.html" || pathname === "/preview" || pathname.endsWith("/preview.html")) {
+      return previewResponse();
+    }
+    if (pathname === "/chianelli-estimating" || pathname === "/chianelli-estimating/") {
+      return Response.redirect(new URL("/", url), 307);
+    }
+    if (pathname.startsWith("/chianelli-estimating/")) {
+      return Response.redirect(new URL(pathname.slice("/chianelli-estimating".length) || "/", url), 307);
+    }
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);

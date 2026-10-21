@@ -9,10 +9,25 @@ copyFileSync(previewFile, path.resolve("public/preview.html"));
 function previewPagePlugin(): Plugin {
   const handle: Connect.NextHandleFunction = (req, res, next) => {
     const url = (req.url ?? "").split("?")[0];
-    if (url !== "/preview.html") return next();
-    res.statusCode = 200;
-    res.setHeader("content-type", "text/html; charset=utf-8");
-    res.end(readFileSync(previewFile));
+    if (url === "/preview.html" || url === "/preview" || url.endsWith("/preview.html")) {
+      res.statusCode = 200;
+      res.setHeader("content-type", "text/html; charset=utf-8");
+      res.end(readFileSync(previewFile));
+      return;
+    }
+    if (url === "/chianelli-estimating" || url === "/chianelli-estimating/") {
+      res.statusCode = 307;
+      res.setHeader("location", "/");
+      res.end();
+      return;
+    }
+    if (url.startsWith("/chianelli-estimating/")) {
+      res.statusCode = 307;
+      res.setHeader("location", url.slice("/chianelli-estimating".length) || "/");
+      res.end();
+      return;
+    }
+    next();
   };
   const install = (middlewares: Connect.Server) => {
     middlewares.stack.unshift({ route: "", handle });
