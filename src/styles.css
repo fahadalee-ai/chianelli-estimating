@@ -1,0 +1,512 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+/* Tokens mirror src/styles/theme.js */
+@theme inline {
+  --radius: 16px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 28px;
+  --radius-4xl: 36px;
+  --radius-full: 999px;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-dark: var(--primary-dark);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-ink: var(--ink);
+  --color-charcoal: var(--charcoal);
+  --color-line: var(--line);
+  --color-border: var(--line);
+  --color-input: var(--line);
+  --color-ring: var(--primary);
+  --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --primary: #d62828;
+  --primary-foreground: #ffffff;
+  --primary-dark: #9d0208;
+  --ink: #0b0b0b;
+  --charcoal: #1c1c1e;
+  --background: #f5f5f7;
+  --foreground: #111111;
+  --card: #ffffff;
+  --card-foreground: #111111;
+  --popover: #ffffff;
+  --popover-foreground: #111111;
+  --secondary: #f5f5f7;
+  --secondary-foreground: #111111;
+  --muted: #ececef;
+  --muted-foreground: #6b7280;
+  --accent: #d62828;
+  --accent-foreground: #ffffff;
+  --destructive: #9d0208;
+  --destructive-foreground: #ffffff;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --line: #e6e6ea;
+  --border-light: #e6e6ea;
+}
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  html,
+  body {
+    background: var(--ink);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.stage {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background:
+    radial-gradient(900px 420px at 50% -10%, color-mix(in srgb, var(--primary) 35%, transparent), transparent 60%),
+    var(--ink);
+}
+
+.device {
+  width: 390px;
+  height: min(844px, calc(100dvh - 32px));
+  background: var(--background);
+  border-radius: 36px;
+  border: 8px solid #141414;
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.viewport {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.anim-forward,
+.anim-back,
+.anim-fade {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@layer components {
+  .screen {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--background);
+    color: var(--foreground);
+  }
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 8px 20px 28px;
+}
+
+.statusbar {
+  position: absolute;
+  z-index: 30;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 22px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.under-status {
+  padding-top: 52px;
+}
+
+.press {
+  transition: transform 160ms ease;
+}
+.press:active {
+  transform: scale(0.97);
+}
+
+.lift {
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.lift:active {
+  transform: scale(0.985);
+}
+
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(11, 11, 11, 0.06);
+}
+
+.field {
+  min-height: 48px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  padding: 0 14px;
+  font-size: 15px;
+  width: 100%;
+  color: var(--foreground);
+}
+.field:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+.field-error {
+  border-color: var(--primary);
+}
+
+.pill {
+  border-radius: 999px;
+}
+
+.sticky-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 15;
+  display: flex;
+  gap: 10px;
+  padding: 12px 20px 16px;
+  background: linear-gradient(to top, var(--card) 72%, transparent);
+}
+
+.run-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 16px 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--ink);
+  color: white;
+}
+
+.bottom-nav {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: end;
+  height: 76px;
+  padding: 0 6px 10px;
+  background: var(--card);
+  border-top: 1px solid var(--line);
+  position: relative;
+  z-index: 20;
+}
+
+.nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 48px;
+  justify-content: flex-end;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 500;
+  background: none;
+  border: 0;
+}
+
+.nav-btn[data-active="true"] {
+  color: var(--primary);
+}
+
+.nav-center {
+  width: 62px;
+  height: 62px;
+  margin-top: -28px;
+  border-radius: 999px;
+  border: 4px solid var(--card);
+  background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+  color: white;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 20px color-mix(in srgb, var(--primary) 40%, transparent);
+}
+
+.sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: rgba(11, 11, 11, 0.46);
+  display: flex;
+  align-items: flex-end;
+  animation: fade-in 200ms ease;
+}
+
+.sheet {
+  width: 100%;
+  max-height: 82%;
+  overflow: auto;
+  background: var(--card);
+  border-radius: 24px 24px 0 0;
+  padding: 10px 20px 24px;
+  animation: sheet-up 250ms ease;
+}
+
+.handle {
+  width: 42px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--line);
+  margin: 4px auto 12px;
+}
+
+.skel {
+  background: linear-gradient(90deg, var(--muted) 25%, #f7f7f8 37%, var(--muted) 63%);
+  background-size: 800px 100%;
+  animation: shimmer 1.2s infinite linear;
+  border-radius: 12px;
+}
+
+.anim-forward {
+  animation: slide-right 250ms ease;
+}
+.anim-back {
+  animation: slide-back 250ms ease;
+}
+.anim-fade {
+  animation: fade-in 250ms ease;
+}
+
+.logo-pop {
+  animation: logo-pop 900ms cubic-bezier(0.2, 0.8, 0.2, 1.15) both;
+}
+.tag-in {
+  animation: fade-up 600ms ease 600ms both;
+}
+.sweep {
+  position: absolute;
+  inset: -20% auto -20% -40%;
+  width: 35%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  transform: rotate(18deg);
+  animation: sweep 900ms ease 1000ms both;
+}
+.boot-bar > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+  animation: load 2800ms linear both;
+}
+.check-pop {
+  animation: logo-pop 500ms cubic-bezier(0.2, 0.8, 0.2, 1.2) both;
+}
+.donut-seg {
+  transition: stroke-dasharray 800ms ease;
+}
+
+@keyframes logo-pop {
+  0% { opacity: 0; transform: scale(0.6); }
+  70% { opacity: 1; transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes sweep {
+  from { left: -40%; }
+  to { left: 120%; }
+}
+@keyframes load {
+  to { width: 100%; }
+}
+@keyframes slide-right {
+  from { opacity: 0.4; transform: translateX(24px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes slide-back {
+  from { opacity: 0.4; transform: translateX(-24px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sheet-up {
+  from { transform: translateY(24px); }
+  to { transform: none; }
+}
+@keyframes shimmer {
+  from { background-position: -400px 0; }
+  to { background-position: 400px 0; }
+}
+
+.toast-wrap {
+  position: absolute;
+  z-index: 50;
+  left: 16px;
+  right: 16px;
+  bottom: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  background: var(--ink);
+  color: white;
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  animation: fade-up 200ms ease;
+}
+
+.map-fake {
+  height: 120px;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.45) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.45) 1px, transparent 1px),
+    linear-gradient(160deg, #d7e4d4, #c5d4e8 55%, #e7e0d4);
+  background-size: 22px 22px, 22px 22px, auto;
+}
+
+@media (max-width: 430px) {
+  .stage {
+    padding: 0;
+    background: var(--background);
+  }
+  .device {
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+/* preview.html already draws the phone, status bar, and island. */
+html.embedded,
+html.embedded body {
+  height: 100%;
+  min-height: 0;
+  background: var(--background);
+}
+
+html.embedded .stage {
+  min-height: 100%;
+  height: 100%;
+  padding: 0;
+  background: var(--background);
+}
+
+html.embedded .device {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+html.embedded .statusbar {
+  display: none;
+}
+
+html.embedded .under-status {
+  padding-top: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-forward,
+  .anim-back,
+  .anim-fade,
+  .logo-pop,
+  .tag-in,
+  .sweep,
+  .boot-bar > span,
+  .check-pop,
+  .skel {
+    animation: none !important;
+  }
+  .donut-seg {
+    transition: none;
+  }
+}
