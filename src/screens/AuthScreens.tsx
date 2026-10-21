@@ -14,27 +14,17 @@ export function LoginScreen() {
   const [password, setPassword] = useState("estimate1");
   const [show, setShow] = useState(false);
   const [remember, setRemember] = useState(true);
-  const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({});
   const [loading, setLoading] = useState<"form" | "google" | "apple" | null>(null);
 
   const submit = (provider?: "google" | "apple") => {
-    if (provider) {
-      setLoading(provider);
-      window.setTimeout(() => {
+    setLoading(provider ?? "form");
+    window.setTimeout(() => {
+      if (provider) {
         login(demoUser, true);
         toast(`Signed in with ${provider === "google" ? "Google" : "Apple"}`);
         reset({ name: "home" });
-      }, 800);
-      return;
-    }
-    const next: typeof errors = {};
-    if (!isEmail(email)) next.email = "Enter a valid email address.";
-    if (password.length < 8) next.password = "Password must be at least 8 characters.";
-    if (password === "incorrect") next.form = "Email or password is incorrect.";
-    setErrors(next);
-    if (Object.keys(next).length) return;
-    setLoading("form");
-    window.setTimeout(() => {
+        return;
+      }
       const known = email.toLowerCase() === demoUser.email;
       const name = email.split("@")[0].replace(/[.\-_]/g, " ");
       login(
@@ -50,7 +40,7 @@ export function LoginScreen() {
       );
       toast("Welcome back");
       reset({ name: "home" });
-    }, 700);
+    }, provider ? 800 : 700);
   };
 
   return (
@@ -62,14 +52,13 @@ export function LoginScreen() {
       </div>
       <div className="scroll rounded-t-3xl bg-card pt-6">
         <div className="space-y-3">
-          <InputField label="Email" type="email" autoComplete="email" value={email} error={errors.email} onChange={(event) => setEmail(event.target.value)} />
+          <InputField label="Email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />
           <div className="relative">
             <InputField
               label="Password"
               type={show ? "text" : "password"}
               autoComplete="current-password"
               value={password}
-              error={errors.password}
               onChange={(event) => setPassword(event.target.value)}
             />
             <button type="button" aria-label={show ? "Hide password" : "Show password"} className="absolute right-3 top-9 text-muted-foreground" onClick={() => setShow((value) => !value)}>
@@ -85,7 +74,6 @@ export function LoginScreen() {
               Forgot Password?
             </button>
           </div>
-          {errors.form ? <p className="rounded-xl bg-primary/10 px-3 py-2 text-sm text-primary">{errors.form}</p> : null}
           <PrimaryButton loading={loading === "form"} onClick={() => submit()}>
             Login
           </PrimaryButton>
@@ -182,31 +170,13 @@ export function RegisterScreen() {
   const { back, reset } = useNav();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(emptyProfile);
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const set = (patch: Partial<typeof form>) => setForm((current) => ({ ...current, ...patch }));
 
-  const next = () => {
-    const nextErrors: Record<string, string> = {};
-    if (form.fullName.trim().length < 2) nextErrors.fullName = "Enter your full name.";
-    if (!isEmail(form.email)) nextErrors.email = "Enter a valid email address.";
-    if (form.phone.replace(/\D/g, "").length < 10) nextErrors.phone = "Enter a 10-digit phone number.";
-    if (form.password.length < 8) nextErrors.password = "Use at least 8 characters.";
-    if (form.confirm !== form.password) nextErrors.confirm = "Passwords do not match.";
-    setErrors(nextErrors);
-    if (!Object.keys(nextErrors).length) setStep(1);
-  };
+  const next = () => setStep(1);
 
   const create = () => {
-    const nextErrors: Record<string, string> = {};
-    if (!form.role) nextErrors.role = "Choose the option that fits you.";
-    if (!form.city.trim()) nextErrors.city = "City is required.";
-    if (!/^\d{5}$/.test(form.zip)) nextErrors.zip = "Enter a 5-digit ZIP code.";
-    if (!form.interests.length) nextErrors.interests = "Select at least one interest.";
-    if (!form.agree) nextErrors.agree = "Agree to the Terms and Privacy Policy to continue.";
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length) return;
     setLoading(true);
     window.setTimeout(() => {
       login(
@@ -254,16 +224,16 @@ export function RegisterScreen() {
         <StepIndicator steps={["Account", "Profile"]} current={step} />
         {step === 0 ? (
           <div className="space-y-3">
-            <InputField label="Full Name" value={form.fullName} error={errors.fullName} onChange={(event) => set({ fullName: event.target.value })} />
-            <InputField label="Email" type="email" value={form.email} error={errors.email} onChange={(event) => set({ email: event.target.value })} />
-            <InputField label="Phone" inputMode="tel" value={form.phone} error={errors.phone} onChange={(event) => set({ phone: maskPhone(event.target.value) })} />
+            <InputField label="Full Name" value={form.fullName} onChange={(event) => set({ fullName: event.target.value })} />
+            <InputField label="Email" type="email" value={form.email} onChange={(event) => set({ email: event.target.value })} />
+            <InputField label="Phone" inputMode="tel" value={form.phone} onChange={(event) => set({ phone: maskPhone(event.target.value) })} />
             <div className="relative">
-              <InputField label="Password" type={show ? "text" : "password"} value={form.password} error={errors.password} onChange={(event) => set({ password: event.target.value })} />
+              <InputField label="Password" type={show ? "text" : "password"} value={form.password} onChange={(event) => set({ password: event.target.value })} />
               <button type="button" aria-label="Toggle password visibility" className="absolute right-3 top-9 text-muted-foreground" onClick={() => setShow((value) => !value)}>
                 {show ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-            <InputField label="Confirm Password" type={show ? "text" : "password"} value={form.confirm} error={errors.confirm} onChange={(event) => set({ confirm: event.target.value })} />
+            <InputField label="Confirm Password" type={show ? "text" : "password"} value={form.confirm} onChange={(event) => set({ confirm: event.target.value })} />
             <PrimaryButton onClick={next}>Continue</PrimaryButton>
           </div>
         ) : (
@@ -276,11 +246,10 @@ export function RegisterScreen() {
                 </Chip>
               ))}
             </div>
-            {errors.role ? <p className="text-xs text-primary">{errors.role}</p> : null}
             <InputField label="Company Name (optional)" value={form.company} onChange={(event) => set({ company: event.target.value })} />
-            <InputField label="City" value={form.city} error={errors.city} onChange={(event) => set({ city: event.target.value })} />
+            <InputField label="City" value={form.city} onChange={(event) => set({ city: event.target.value })} />
             <SelectField label="State" value={form.state} onChange={(state) => set({ state })} options={US_STATES.map(([value, label]) => ({ value, label }))} />
-            <InputField label="ZIP" inputMode="numeric" value={form.zip} error={errors.zip} onChange={(event) => set({ zip: event.target.value.replace(/\D/g, "").slice(0, 5) })} />
+            <InputField label="ZIP" inputMode="numeric" value={form.zip} onChange={(event) => set({ zip: event.target.value.replace(/\D/g, "").slice(0, 5) })} />
             <p className="text-sm font-medium">Interested in</p>
             <div className="flex flex-wrap gap-2">
               {INTERESTS.map((item) => (
@@ -297,12 +266,10 @@ export function RegisterScreen() {
                 </Chip>
               ))}
             </div>
-            {errors.interests ? <p className="text-xs text-primary">{errors.interests}</p> : null}
             <label className="flex items-start gap-2 text-sm">
               <input type="checkbox" className="mt-1" checked={form.agree} onChange={(event) => set({ agree: event.target.checked })} />
               <span>I agree to the Terms & Privacy Policy.</span>
             </label>
-            {errors.agree ? <p className="text-xs text-primary">{errors.agree}</p> : null}
             <PrimaryButton loading={loading} onClick={create}>
               Create Account
             </PrimaryButton>

@@ -1,27 +1,43 @@
+import { copyFileSync, readFileSync } from "node:fs";
+import path from "node:path";
+import type { Connect, Plugin } from "vite";
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-/** Public URL path (trailing slash). Must match Nginx `location` and `PREVIEW_URL` in preview.html. */
-const PRODUCTION_BASE = "/chianelli-estimating/";
+const previewFile = path.resolve("preview.html");
+copyFileSync(previewFile, path.resolve("public/preview.html"));
+
+function previewPagePlugin(): Plugin {
+  const handle: Connect.NextHandleFunction = (req, res, next) => {
+    const url = (req.url ?? "").split("?")[0];
+    if (url !== "/preview.html") return next();
+    res.statusCode = 200;
+    res.setHeader("content-type", "text/html; charset=utf-8");
+    res.end(readFileSync(previewFile));
+  };
+  const install = (middlewares: Connect.Server) => {
+    middlewares.stack.unshift({ route: "", handle });
+  };
+  return {
+    name: "preview-html",
+    enforce: "pre",
+    configureServer(server) {
+      install(server.middlewares);
+    },
+    configurePreviewServer(server) {
+      install(server.middlewares);
+    },
+  };
+}
 
 export default defineConfig({
-  cloudflare: false,
+  nitro: { preset: "vercel" },
+  plugins: [previewPagePlugin()],
   vite: {
-    // Subpath must match Nginx and preview.html; use this for dev/preview/build so PM2 `vite preview` matches assets.
-    base: PRODUCTION_BASE,
-    // Allow the domain to access the preview server (if needed for SSR testing)
     server: {
-        allowedHosts: [
-            "demo.sourapps.com",
-            "localhost",
-            "127.0.0.1",
-        ],
+      allowedHosts: ["localhost", "127.0.0.1", ".vercel.app"],
     },
     preview: {
-        allowedHosts: [
-            "demo.sourapps.com",
-            "localhost",
-            "127.0.0.1",
-        ],
+      allowedHosts: ["localhost", "127.0.0.1", ".vercel.app"],
     },
   },
 });
